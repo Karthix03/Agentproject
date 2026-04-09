@@ -1,0 +1,28 @@
+# ─── Brand-Aware AI Marketing Agent — Dependencies ───────────────────────────
+# Install with: pip install -r requirements.txt
+# Python 3.10+ required
+
+# ── Web Framework ──────────────────────────────────────────────────────────────
+fastapi==0.111.0
+uvicorn==0.29.0
+
+# ── LangChain Core + Integrations ─────────────────────────────────────────────
+langchain==0.2.6
+langchain-core==0.2.43
+langchain-openai==0.1.9          # Grok via OpenAI-compatible endpoint
+langchain-community==0.2.6       # FAISS integration
+langchain-huggingface==0.0.3     # Local HuggingFace embeddings
+
+# ── LLM & Embeddings ──────────────────────────────────────────────────────────
+openai==1.35.10                  # Required by langchain-openai
+sentence-transformers==3.0.1     # all-MiniLM-L6-v2 local embedding model
+tiktoken==0.7.0                  # Token counting for OpenAI-compatible APIs
+
+# ── Vector Database ───────────────────────────────────────────────────────────
+faiss-cpu==1.8.0                 # CPU-optimized FAISS (no GPU required)
+
+# ── Data Validation ───────────────────────────────────────────────────────────
+pydantic==2.7.4
+
+# ── Configuration ─────────────────────────────────────────────────────────────
+python-dotenv==1.0.1             # Loads .env file into os.environ

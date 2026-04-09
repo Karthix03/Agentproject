@@ -1,0 +1,25 @@
+# ── Secrets ───────────────────────────────────────────
+.env                  # NEVER commit your API key
+
+# ── Python ────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# ── FAISS Index ───────────────────────────────────────
+faiss_index/          # Auto-generated; rebuild via vector_db.py
+
+# ── IDE / OS ──────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp

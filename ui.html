@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Brand AI — Marketing Content Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple: #7F77DD;
+    --purple-light: #EEEDFE;
+    --purple-dark: #3C3489;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --coral: #D85A30;
+    --coral-light: #FAECE7;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --gray-50: #F8F8F6;
+    --gray-100: #F1EFE8;
+    --gray-200: #D3D1C7;
+    --gray-400: #888780;
+    --gray-600: #5F5E5A;
+    --gray-800: #2C2C2A;
+    --white: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #0F0F0F;
+    color: #E8E6E0;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 2rem 2rem 1rem;
+    border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .logo {
+    width: 38px; height: 38px;
+    background: var(--purple);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo svg { width: 20px; height: 20px; fill: white; }
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #F0EEE8;
+    letter-spacing: -0.3px;
+  }
+  header p { font-size: 13px; color: #888780; margin-top: 1px; }
+  .status-dot {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: #888780;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #639922; }
+
+  /* ── Main layout ── */
+  main {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 73px);
+  }
+
+  /* ── Sidebar / Form ── */
+  aside {
+    border-right: 0.5px solid rgba(255,255,255,0.08);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5F5E5A;
+    margin-bottom: 0.75rem;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; color: #B4B2A9; font-weight: 500; }
+
+  .field input,
+  .field textarea,
+  .field select {
+    background: #1A1A1A;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-sm);
+    color: #E8E6E0;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .field input:focus,
+  .field textarea:focus,
+  .field select:focus { border-color: var(--purple); }
+  .field input::placeholder,
+  .field textarea::placeholder { color: #444441; }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .field select option { background: #1A1A1A; }
+
+  /* Tone pills */
+  .tone-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .tone-pill {
+    padding: 7px 4px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    background: #1A1A1A;
+    font-size: 12px;
+    color: #888780;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .tone-pill:hover { border-color: var(--purple); color: #AFA9EC; background: rgba(127,119,221,0.1); }
+  .tone-pill.active { background: rgba(127,119,221,0.2); border-color: var(--purple); color: #AFA9EC; font-weight: 500; }
+
+  /* Variations slider */
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  .slider-row input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    outline: none;
+    border: none;
+    padding: 0;
+  }
+  .slider-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--purple);
+    cursor: pointer;
+  }
+  .slider-val {
+    font-size: 13px; font-weight: 500;
+    color: #AFA9EC;
+    min-width: 20px;
+    text-align: right;
+  }
+
+  /* Generate button */
+  .btn-generate {
+    width: 100%;
+    padding: 12px;
+    background: var(--purple);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 0.5rem;
+  }
+  .btn-generate:hover { background: #6B63C8; }
+  .btn-generate:active { transform: scale(0.98); }
+  .btn-generate:disabled { background: #2C2C2A; color: #444441; cursor: not-allowed; transform: none; }
+
+  /* ── Results area ── */
+  .results-area {
+    padding: 1.5rem;
+    overflow-y: auto;
+  }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+    color: #444441;
+    text-align: center;
+    padding: 3rem;
+  }
+  .empty-icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    border: 0.5px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .empty-icon svg { width: 24px; height: 24px; opacity: 0.3; }
+  .empty-state h2 { font-family: 'Syne', sans-serif; font-size: 16px; color: #5F5E5A; font-weight: 600; }
+  .empty-state p { font-size: 13px; max-width: 280px; line-height: 1.6; }
+
+  /* Loading state */
+  .loading-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 16px;
+    color: #888780;
+    text-align: center;
+  }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 2px solid rgba(127,119,221,0.2);
+    border-top-color: var(--purple);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-steps { font-size: 13px; color: #5F5E5A; }
+  .loading-step { padding: 3px 0; transition: color 0.3s; }
+  .loading-step.active { color: #AFA9EC; }
+  .loading-step.done { color: #1D9E75; }
+
+  /* Results header */
+  .results-header {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .results-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #E8E6E0;
+  }
+  .results-meta { font-size: 12px; color: #5F5E5A; }
+  .btn-clear {
+    background: transparent;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-sm);
+    color: #888780;
+    font-size: 12px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+  .btn-clear:hover { border-color: rgba(255,255,255,0.2); color: #B4B2A9; }
+
+  /* Result cards grid */
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* Variation card */
+  .variation-card {
+    background: #161616;
+    border: 0.5px solid rgba(255,255,255,0.07);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    padding: 12px 14px 10px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-num {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5F5E5A;
+  }
+  .card-tone-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(127,119,221,0.15);
+    color: #AFA9EC;
+    font-weight: 500;
+  }
+
+  .card-body { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+
+  .content-block { display: flex; flex-direction: column; gap: 4px; }
+  .block-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .block-label .icon { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .icon-caption { background: var(--purple); }
+  .icon-hashtag { background: var(--teal); }
+  .icon-ad { background: var(--coral); }
+  .icon-blog { background: var(--amber); }
+  .label-caption { color: #7F77DD; }
+  .label-hashtag { color: #1D9E75; }
+  .label-ad { color: #D85A30; }
+  .label-blog { color: #BA7517; }
+
+  .block-text { font-size: 13px; color: #C8C6C0; line-height: 1.65; }
+  .hashtags-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .hashtag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: rgba(29,158,117,0.12);
+    color: #5DCAA5;
+    font-weight: 500;
+  }
+  .blog-list { display: flex; flex-direction: column; gap: 4px; }
+  .blog-item {
+    font-size: 12px;
+    color: #888780;
+    padding: 5px 10px;
+    background: rgba(186,117,23,0.08);
+    border-radius: var(--radius-sm);
+    border-left: 2px solid var(--amber);
+    border-radius: 0;
+  }
+
+  .card-footer {
+    padding: 10px 14px;
+    border-top: 0.5px solid rgba(255,255,255,0.05);
+    display: flex;
+    gap: 6px;
+  }
+  .btn-copy {
+    flex: 1;
+    padding: 7px;
+    background: transparent;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-sm);
+    color: #888780;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .btn-copy:hover { background: rgba(255,255,255,0.04); color: #C8C6C0; border-color: rgba(255,255,255,0.15); }
+  .btn-copy.copied { color: #5DCAA5; border-color: rgba(29,158,117,0.3); }
+
+  /* Error state */
+  .error-banner {
+    display: none;
+    background: rgba(226,75,74,0.1);
+    border: 0.5px solid rgba(226,75,74,0.3);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #F09595;
+    margin-bottom: 1rem;
+  }
+
+  /* Divider in aside */
+  .divider { height: 0.5px; background: rgba(255,255,255,0.06); }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; }
+    aside { border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+    .results-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+  </div>
+  <div>
+    <h1>Brand AI</h1>
+    <p>Marketing Content Generator</p>
+  </div>
+  <div class="status-dot" id="statusDot">
+    <div class="dot" id="dotEl"></div>
+    <span id="statusText">Checking server...</span>
+  </div>
+</header>
+
+<main>
+  <!-- ── Sidebar Form ── -->
+  <aside>
+    <div>
+      <div class="form-section-label">Brand details</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="field">
+          <label>Brand name</label>
+          <input type="text" id="brandName" placeholder="e.g. Lumina Kicks" />
+        </div>
+        <div class="field">
+          <label>Target audience</label>
+          <textarea id="targetAudience" placeholder="e.g. Gen Z sneaker enthusiasts aged 18–25"></textarea>
+        </div>
+        <div class="field">
+          <label>Industry</label>
+          <select id="industry">
+            <option value="">Select industry...</option>
+            <option>Fashion</option>
+            <option>Tech</option>
+            <option>Fitness</option>
+            <option>Food &amp; Beverage</option>
+            <option>Healthcare</option>
+            <option>Education</option>
+            <option>E-commerce</option>
+            <option>Real Estate</option>
+            <option>Travel</option>
+            <option>Beverages</option>
+            <option>Finance</option>
+            <option>Beauty</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Campaign goal</label>
+          <textarea id="campaignGoal" placeholder="e.g. Launch summer streetwear collection and drive sales"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <div class="form-section-label">Tone</div>
+      <div class="tone-grid" id="toneGrid">
+        <button class="tone-pill active" data-tone="Fun">Fun</button>
+        <button class="tone-pill" data-tone="Casual">Casual</button>
+        <button class="tone-pill" data-tone="Formal">Formal</button>
+        <button class="tone-pill" data-tone="Motivational">Motivational</button>
+        <button class="tone-pill" data-tone="Energetic">Energetic</button>
+        <button class="tone-pill" data-tone="Inspirational">Inspirational</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <div class="form-section-label">Variations to generate</div>
+      <div class="slider-row">
+        <input type="range" id="variations" min="1" max="10" value="5" step="1" />
+        <span class="slider-val" id="varVal">5</span>
+      </div>
+      <p style="font-size:11px;color:#444441;margin-top:6px;">Each variation is a unique set of caption, hashtags, ad copy &amp; blog ideas.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="btn-generate" id="generateBtn" onclick="generate()">
+      Generate content
+    </button>
+  </aside>
+
+  <!-- ── Results ── -->
+  <section class="results-area" id="resultsArea">
+
+    <div class="error-banner" id="errorBanner"></div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+        </svg>
+      </div>
+      <h2>Ready to generate</h2>
+      <p>Fill in your brand details on the left and click Generate to get up to 10 unique marketing content variations.</p>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <div>
+        <p style="font-size:14px;color:#888780;font-weight:500;margin-bottom:8px;">Agent pipeline running...</p>
+        <div class="loading-steps" id="loadingSteps">
+          <div class="loading-step" id="step1">Step 1 — Analyzing brand context</div>
+          <div class="loading-step" id="step2">Step 2 — Retrieving similar campaigns (FAISS)</div>
+          <div class="loading-step" id="step3">Step 3 — Generating content variations</div>
+          <div class="loading-step" id="step4">Step 4 — Structuring output</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results header -->
+    <div class="results-header" id="resultsHeader">
+      <div>
+        <h2 id="resultsTitle">Content variations</h2>
+        <p class="results-meta" id="resultsMeta"></p>
+      </div>
+      <button class="btn-clear" onclick="clearResults()">Clear</button>
+    </div>
+
+    <!-- Cards grid -->
+    <div class="results-grid" id="resultsGrid"></div>
+
+  </section>
+</main>
+
+<script>
+const API_BASE = 'http://127.0.0.1:8000';
+let selectedTone = 'Fun';
+
+// ── Tone pills ──────────────────────────────────────────────────
+document.getElementById('toneGrid').addEventListener('click', e => {
+  if (!e.target.classList.contains('tone-pill')) return;
+  document.querySelectorAll('.tone-pill').forEach(p => p.classList.remove('active'));
+  e.target.classList.add('active');
+  selectedTone = e.target.dataset.tone;
+});
+
+// ── Variations slider ───────────────────────────────────────────
+const slider = document.getElementById('variations');
+const valEl = document.getElementById('varVal');
+slider.addEventListener('input', () => { valEl.textContent = slider.value; });
+
+// ── Server health check ─────────────────────────────────────────
+async function checkServer() {
+  try {
+    const r = await fetch(API_BASE + '/');
+    const dot = document.getElementById('dotEl');
+    const txt = document.getElementById('statusText');
+    if (r.ok) {
+      dot.style.background = '#639922';
+      txt.textContent = 'Server online';
+    } else {
+      dot.style.background = '#E24B4A';
+      txt.textContent = 'Server error';
+    }
+  } catch {
+    document.getElementById('dotEl').style.background = '#E24B4A';
+    document.getElementById('statusText').textContent = 'Server offline';
+  }
+}
+checkServer();
+
+// ── Generate ────────────────────────────────────────────────────
+async function generate() {
+  const brandName = document.getElementById('brandName').value.trim();
+  const targetAudience = document.getElementById('targetAudience').value.trim();
+  const industry = document.getElementById('industry').value;
+  const campaignGoal = document.getElementById('campaignGoal').value.trim();
+  const count = parseInt(slider.value);
+
+  // Validation
+  const err = document.getElementById('errorBanner');
+  err.style.display = 'none';
+  if (!brandName || !targetAudience || !industry || !campaignGoal) {
+    err.textContent = 'Please fill in all fields — brand name, target audience, industry, and campaign goal.';
+    err.style.display = 'block';
+    return;
+  }
+
+  // UI states
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsHeader').style.display = 'none';
+  document.getElementById('resultsGrid').innerHTML = '';
+  const loading = document.getElementById('loadingState');
+  loading.style.display = 'flex';
+  document.getElementById('generateBtn').disabled = true;
+
+  // Animate loading steps
+  const steps = ['step1','step2','step3','step4'];
+  steps.forEach(s => { document.getElementById(s).className = 'loading-step'; });
+  let si = 0;
+  const stepTimer = setInterval(() => {
+    if (si > 0) document.getElementById(steps[si-1]).className = 'loading-step done';
+    if (si < steps.length) {
+      document.getElementById(steps[si]).className = 'loading-step active';
+      si++;
+    }
+  }, 1200);
+
+  // Fire all requests in parallel
+  const payload = { brand_name: brandName, target_audience: targetAudience, industry, tone: selectedTone, campaign_goal: campaignGoal };
+  const requests = Array.from({ length: count }, () =>
+    fetch(API_BASE + '/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(r => r.json())
+  );
+
+  try {
+    const results = await Promise.allSettled(requests);
+    clearInterval(stepTimer);
+    steps.forEach(s => { document.getElementById(s).className = 'loading-step done'; });
+
+    await new Promise(r => setTimeout(r, 400));
+
+    loading.style.display = 'none';
+    document.getElementById('generateBtn').disabled = false;
+
+    const successes = results.filter(r => r.status === 'fulfilled' && !r.value.detail);
+    const grid = document.getElementById('resultsGrid');
+
+    if (successes.length === 0) {
+      const firstErr = results[0];
+      const msg = firstErr.reason?.message || firstErr.value?.detail || 'Unknown error. Check your server and API key.';
+      err.textContent = 'Error: ' + msg;
+      err.style.display = 'block';
+      document.getElementById('emptyState').style.display = 'flex';
+      return;
+    }
+
+    successes.forEach((r, i) => {
+      const d = r.value;
+      grid.innerHTML += buildCard(d, i + 1, selectedTone);
+    });
+
+    const header = document.getElementById('resultsHeader');
+    header.style.display = 'flex';
+    document.getElementById('resultsTitle').textContent = `${successes.length} variation${successes.length > 1 ? 's' : ''} generated`;
+    document.getElementById('resultsMeta').textContent = `${brandName} · ${industry} · ${selectedTone}`;
+
+  } catch(e) {
+    clearInterval(stepTimer);
+    loading.style.display = 'none';
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('emptyState').style.display = 'flex';
+    err.textContent = 'Connection failed. Make sure your FastAPI server is running on port 8000.';
+    err.style.display = 'block';
+  }
+}
+
+// ── Build card HTML ─────────────────────────────────────────────
+function buildCard(d, num, tone) {
+  const hashtags = (d.hashtags || []).map(h => `<span class="hashtag">${h}</span>`).join('');
+  const blogs = (d.blog_ideas || []).map(b => `<div class="blog-item">${b}</div>`).join('');
+  const delay = (num - 1) * 0.06;
+
+  return `
+  <div class="variation-card" style="animation-delay:${delay}s" id="card-${num}">
+    <div class="card-header">
+      <span class="card-num">Variation ${num}</span>
+      <span class="card-tone-badge">${tone}</span>
+    </div>
+    <div class="card-body">
+      <div class="content-block">
+        <div class="block-label label-caption">
+          <div class="icon icon-caption"></div>
+          Social media caption
+        </div>
+        <div class="block-text">${d.social_media_caption || '—'}</div>
+      </div>
+      <div class="content-block">
+        <div class="block-label label-hashtag">
+          <div class="icon icon-hashtag"></div>
+          Hashtags
+        </div>
+        <div class="hashtags-row">${hashtags}</div>
+      </div>
+      <div class="content-block">
+        <div class="block-label label-ad">
+          <div class="icon icon-ad"></div>
+          Ad copy
+        </div>
+        <div class="block-text">${d.ad_copy || '—'}</div>
+      </div>
+      ${blogs ? `
+      <div class="content-block">
+        <div class="block-label label-blog">
+          <div class="icon icon-blog"></div>
+          Blog ideas
+        </div>
+        <div class="blog-list">${blogs}</div>
+      </div>` : ''}
+    </div>
+    <div class="card-footer">
+      <button class="btn-copy" onclick="copyCaption(${num}, this)">Copy caption</button>
+      <button class="btn-copy" onclick="copyAll(${num}, this)">Copy all</button>
+    </div>
+  </div>`;
+}
+
+// ── Copy helpers ────────────────────────────────────────────────
+const cardData = {};
+function copyCaption(num, btn) {
+  const card = document.getElementById('card-' + num);
+  const caption = card.querySelectorAll('.block-text')[0].textContent;
+  navigator.clipboard.writeText(caption).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy caption'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function copyAll(num, btn) {
+  const card = document.getElementById('card-' + num);
+  const texts = [...card.querySelectorAll('.block-text')].map(el => el.textContent);
+  const tags = [...card.querySelectorAll('.hashtag')].map(el => el.textContent).join(' ');
+  const blogs = [...card.querySelectorAll('.blog-item')].map((el,i) => `${i+1}. ${el.textContent}`).join('\n');
+  const full = `CAPTION:\n${texts[0]}\n\nHASHTAGS:\n${tags}\n\nAD COPY:\n${texts[1]}\n\nBLOG IDEAS:\n${blogs}`;
+  navigator.clipboard.writeText(full).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy all'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function clearResults() {
+  document.getElementById('resultsGrid').innerHTML = '';
+  document.getElementById('resultsHeader').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'flex';
+  document.getElementById('errorBanner').style.display = 'none';
+}
+
+// Enter key to generate
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.ctrlKey) generate();
+});
+</script>
+</body>
+</html>
