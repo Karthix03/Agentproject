@@ -98,3 +98,5 @@ GROQ_API_KEY=your_groq_api_key_here
 ```bash
 uvicorn main:app --reload
 ```
+
+for running front-end : Copy The Path Of The "ui.html" File And Paste It In The Browser
